@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Para archivos en Documents/Constancias (privado) -->
+    <external-files-path
+        name="documents"
+        path="Documents/Constancias/" />
+
+    <!-- Para fotos capturadas -->
+    <external-files-path
+        name="pictures"
+        path="Pictures/" />
+
+    <!-- Para todos los archivos externos privados -->
+    <external-files-path
+        name="all_files"
+        path="." />
+
+    <!-- Para archivos temporales de vista previa -->
+    <cache-path
+        name="cache"
+        path="." />
+
+    <!-- Para carpeta Downloads pública (Android 9 y anteriores) -->
+    <external-path
+        name="downloads"
+        path="Download/" />
+</paths>

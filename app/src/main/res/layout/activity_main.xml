@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@android:color/white"
+    android:padding="24dp">
+
+    <!-- Título principal -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="APP SEGURA"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="40dp" />
+
+    <!-- Contenedor de huella con círculo decorativo -->
+    <FrameLayout
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/circle_background">
+
+        <!-- Icono huella -->
+        <ImageView
+            android:id="@+id/imgHuella"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_fingerprint"
+            android:contentDescription="Ingresar con huella digital"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:focusable="true" />
+    </FrameLayout>
+
+    <!-- Texto de instrucción -->
+    <TextView
+        android:id="@+id/txtHuella"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TOCA EL SENSOR DE HUELLA PARA INGRESAR"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:textAlignment="center"
+        android:layout_marginTop="8dp"
+        android:paddingHorizontal="16dp"/>
+
+</LinearLayout>
