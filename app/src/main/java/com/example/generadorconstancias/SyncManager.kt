@@ -14,7 +14,7 @@ class SyncManager(private val context: Context) {
 
     // 🔧 CAMBIA ESTA URL POR LA DE TU SERVIDOR
     companion object {
-        private const val BASE_URL = "http://192.168.0.16/swconstancias/"
+        private const val BASE_URL = "http://192.168.0.173/swconstancias/"
         private const val UPLOAD_URL = "${BASE_URL}upload_constancias.php"
         private const val DOWNLOAD_URL = "${BASE_URL}download_constancias.php"
     }
