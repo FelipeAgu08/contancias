@@ -40,6 +40,7 @@ class PdfPreviewActivity : AppCompatActivity() {
     private var pdfFile: File? = null
     private var currentPageIndex = 0
     private var isRendererClosed = false
+    private var constanciaId: Int = -1 // 🔧 NUEVA VARIABLE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +53,8 @@ class PdfPreviewActivity : AppCompatActivity() {
         tvPageInfo = findViewById(R.id.tvPageInfo)
 
         val pdfPath = intent.getStringExtra("PDF_PATH")
+        constanciaId = intent.getIntExtra("CONSTANCIA_ID", -1) // 🔧 RECIBIR ID
+
         if (pdfPath != null) {
             pdfFile = File(pdfPath)
             openPdfRenderer(pdfFile!!)
@@ -69,9 +72,7 @@ class PdfPreviewActivity : AppCompatActivity() {
         }
 
         btnCancelar.setOnClickListener {
-            pdfFile?.delete()
-            Toast.makeText(this, "PDF descartado", Toast.LENGTH_SHORT).show()
-            finish()
+            cancelarConstancia() // 🔧 FUNCIÓN ACTUALIZADA
         }
 
         // Navegación entre páginas (si tiene más de una)
@@ -117,6 +118,78 @@ class PdfPreviewActivity : AppCompatActivity() {
         }
     }
 
+    // 🔧 NUEVA FUNCIÓN PARA CANCELAR CONSTANCIA
+    private fun cancelarConstancia() {
+        try {
+            Log.d("CANCEL_DEBUG", "🔴 CANCELANDO constancia ID: $constanciaId")
+            Log.d("CANCEL_DEBUG", "📊 Total constancias ANTES: ${DatabaseHelper.getInstance(this).contarTotalConstancias()}")
+
+            // Cerrar el renderer
+            currentPage?.close()
+            pdfRenderer?.close()
+            parcelFileDescriptor?.close()
+
+            // Eliminar el archivo PDF temporal
+            val pdfEliminado = pdfFile?.delete() ?: false
+            Log.d("CANCEL_DEBUG", "🗑️ PDF eliminado: $pdfEliminado")
+
+            // Eliminar de la base de datos
+            if (constanciaId != -1) {
+                val db = DatabaseHelper.getInstance(this)
+                val eliminado = db.eliminarConstancia(constanciaId)
+
+                Log.d("CANCEL_DEBUG", "🗑️ Constancia eliminada de BD: $eliminado")
+                Log.d("CANCEL_DEBUG", "📊 Total constancias DESPUÉS: ${db.contarTotalConstancias()}")
+
+                if (eliminado) {
+                    // Decrementar el contador
+                    decrementarContador()
+                    Toast.makeText(this, "Constancia cancelada", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Error al cancelar constancia", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Log.d("CANCEL_DEBUG", "⚠️ ID es -1, no hay nada que eliminar")
+                Toast.makeText(this, "PDF descartado", Toast.LENGTH_SHORT).show()
+            }
+
+            finish()
+        } catch (e: Exception) {
+            Log.e("CANCEL_DEBUG", "❌ Error: ${e.message}", e)
+            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // 🔧 NUEVA FUNCIÓN PARA DECREMENTAR CONTADOR
+    private fun decrementarContador() {
+        try {
+            val db = DatabaseHelper.getInstance(this)
+            val dbWritable = db.writableDatabase
+
+            // Obtener el contador actual
+            val cursor = dbWritable.rawQuery(
+                "SELECT contador FROM oficio WHERE id = 1",
+                null
+            )
+
+            if (cursor.moveToFirst()) {
+                val contadorActual = cursor.getInt(0)
+                val nuevoContador = if (contadorActual > 1) contadorActual - 1 else 1
+
+                // Actualizar el contador
+                val values = ContentValues().apply {
+                    put("contador", nuevoContador)
+                }
+                dbWritable.update("oficio", values, "id = ?", arrayOf("1"))
+
+                Log.d("CONTADOR_DEBUG", "⬇️ Contador decrementado de $contadorActual a $nuevoContador")
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            Log.e("CONTADOR_DEBUG", "❌ Error al decrementar contador: ${e.message}")
+        }
+    }
+
     private fun descargarPDF() {
         try {
             // Cerrar el renderer antes de copiar el archivo
@@ -144,10 +217,6 @@ class PdfPreviewActivity : AppCompatActivity() {
                             inputStream.copyTo(outputStream)
                         }
                     }
-
-                    // Incrementar contador
-                    val dbHelper = DatabaseHelper.getInstance(this)
-                    dbHelper.incrementarContador()
 
                     // Eliminar temporal
                     pdfFile?.delete()
@@ -184,10 +253,6 @@ class PdfPreviewActivity : AppCompatActivity() {
                     finalFile.length(),
                     true
                 )
-
-                // Incrementar contador
-                val dbHelper = DatabaseHelper.getInstance(this)
-                dbHelper.incrementarContador()
 
                 // Eliminar temporal
                 pdfFile?.delete()
@@ -241,10 +306,6 @@ class PdfPreviewActivity : AppCompatActivity() {
                         }
                     }
 
-                    // Incrementar contador
-                    val dbHelper = DatabaseHelper.getInstance(this)
-                    dbHelper.incrementarContador()
-
                     // Eliminar temporal
                     pdfFile?.delete()
 
@@ -269,10 +330,6 @@ class PdfPreviewActivity : AppCompatActivity() {
                         input.copyTo(output)
                     }
                 }
-
-                // Incrementar contador
-                val dbHelper = DatabaseHelper.getInstance(this)
-                dbHelper.incrementarContador()
 
                 // Eliminar temporal
                 pdfFile?.delete()

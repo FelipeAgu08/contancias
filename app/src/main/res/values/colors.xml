@@ -9,4 +9,10 @@
     <color name="purple_light">#EDE7FF</color>
     <color name="gray_unselected">#9E9E9E</color>
     <color name="background_white">#FAFAFA</color>
+    <color name="purple_500">#6200EE</color>
+        <!-- Colores CBTis -->
+        <color name="cbtis_guinda">#7A1F2B</color>
+        <color name="cbtis_blanco">#FFFFFF</color>
+        <color name="cbtis_gris">#6D6D6D</color>
+
 </resources>

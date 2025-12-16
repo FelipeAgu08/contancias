@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item
-        android:id="@+id/navigation_home"
+        android:id="@+id/nav_home"
         android:icon="@drawable/ic_home"
         android:title="Home" />
 
     <item
-        android:id="@+id/navigation_historial"
+        android:id="@+id/nav_historial"
         android:icon="@drawable/ic_historial"
         android:title="Historial" />
 
     <item
-        android:id="@+id/navigation_graficas"
+        android:id="@+id/nav_graficas"
         android:icon="@drawable/ic_graficas"
         android:title="Gráficas" />
+
+    <!-- Nueva opción Servicios -->
+    <item
+        android:id="@+id/nav_servicios"
+        android:icon="@drawable/ic_servicios"
+        android:title="Servicios" />
+
 </menu>

@@ -4,19 +4,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@android:color/white">
+    android:background="@color/cbtis_blanco">
 
-    <!-- Barra superior con título -->
+    <!-- Barra superior -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="@color/cbtis_guinda"
         android:elevation="4dp"
         app:title="Vista Previa"
-        app:titleTextColor="@android:color/white" />
+        app:titleTextColor="@color/cbtis_blanco" />
 
-    <!-- Contenedor del PDF con scroll -->
+    <!-- Contenedor del PDF -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -34,7 +34,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardElevation="4dp"
-                app:cardCornerRadius="8dp">
+                app:cardCornerRadius="8dp"
+                app:cardBackgroundColor="@color/cbtis_blanco">
 
                 <ImageView
                     android:id="@+id/ivPdfPreview"
@@ -43,7 +44,6 @@
                     android:adjustViewBounds="true"
                     android:contentDescription="Vista previa del PDF"
                     android:scaleType="fitCenter" />
-
             </androidx.cardview.widget.CardView>
 
             <!-- Información de página -->
@@ -55,19 +55,18 @@
                 android:text="Página 1 de 1"
                 android:textAlignment="center"
                 android:textSize="14sp"
-                android:textColor="@android:color/darker_gray" />
+                android:textColor="@color/cbtis_gris" />
 
         </LinearLayout>
-
     </ScrollView>
 
-    <!-- Botones de acción -->
+    <!-- Botones -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:background="@android:color/white"
+        android:background="@color/cbtis_blanco"
         android:elevation="8dp">
 
         <Button
@@ -77,6 +76,7 @@
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
             android:text="Cancelar"
+            android:textColor="@color/cbtis_guinda"
             style="?attr/materialButtonOutlinedStyle" />
 
         <Button
@@ -86,6 +86,7 @@
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
             android:text="Compartir"
+            android:textColor="@color/cbtis_guinda"
             style="?attr/materialButtonOutlinedStyle" />
 
         <Button
@@ -93,7 +94,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Descargar" />
+            android:text="Descargar"
+            android:backgroundTint="@color/cbtis_guinda"
+            android:textColor="@color/cbtis_blanco" />
 
     </LinearLayout>
 

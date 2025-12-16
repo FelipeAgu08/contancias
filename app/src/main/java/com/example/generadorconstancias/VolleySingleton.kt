@@ -5,24 +5,21 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
 
+class VolleySingleton private constructor(context: Context) {
 
-// Clase que se implementa, para aplicar el patrón de diseño Singleton,
-// que permite una sola instancia de esta clase
-
-class VolleySingleton constructor(context: Context) {
     companion object {
         @Volatile
         private var INSTANCE: VolleySingleton? = null
+
         fun getInstance(context: Context) =
             INSTANCE ?: synchronized(this) {
-                INSTANCE ?: VolleySingleton(context).also {
-                    INSTANCE = it
-                }
+                INSTANCE ?: VolleySingleton(context).also { INSTANCE = it }
             }
     }
-    val requestQueue: RequestQueue by lazy {
+
+    private val requestQueue: RequestQueue =
         Volley.newRequestQueue(context.applicationContext)
-    }
+
     fun <T> addToRequestQueue(req: Request<T>) {
         requestQueue.add(req)
     }

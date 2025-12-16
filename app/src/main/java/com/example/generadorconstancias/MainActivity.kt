@@ -14,7 +14,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
-
     private lateinit var imgHuella: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,60 +23,100 @@ class MainActivity : AppCompatActivity() {
 
         imgHuella = findViewById(R.id.imgHuella)
 
-        // Inicializamos biometría
+        // Inicializar todo lo relacionado a autenticación biométrica
         initBiometricPrompt()
 
-        // Lanzar autenticación al tocar el ícono
-        imgHuella.setOnClickListener {
-            val biometric = BiometricManager.from(this)
-            when (biometric.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG)) {
-                BiometricManager.BIOMETRIC_SUCCESS -> biometricPrompt.authenticate(promptInfo)
-                BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE ->
-                    Toast.makeText(this, "Este dispositivo no tiene lector de huella", Toast.LENGTH_SHORT).show()
-                BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE ->
-                    Toast.makeText(this, "El hardware biométrico no está disponible", Toast.LENGTH_SHORT).show()
-                BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED ->
-                    Toast.makeText(this, "No hay huella registrada en el dispositivo", Toast.LENGTH_SHORT).show()
-            }
-        }
+        // Ejecutar autenticación automáticamente al iniciar
+        authenticateUser()
+
+        // O permitir que el usuario vuelva a intentar manualmente
+        imgHuella.setOnClickListener { authenticateUser() }
     }
 
+    /**
+     * Inicializa el prompt biométrico y su callback
+     */
     private fun initBiometricPrompt() {
         val executor = ContextCompat.getMainExecutor(this)
 
-        biometricPrompt = BiometricPrompt(this, executor,
+        biometricPrompt = BiometricPrompt(
+            this,
+            executor,
             object : BiometricPrompt.AuthenticationCallback() {
 
+                // 🟢 Huella correcta o autenticación por PIN/PATRÓN
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
-                    Toast.makeText(applicationContext, "Autenticación exitosa ✅", Toast.LENGTH_SHORT).show()
-                    // Abrir siguiente pantalla
+                    msg("Autenticación exitosa ✔")
+
+                    // Ir a Home
                     startActivity(Intent(this@MainActivity, HomeActivity::class.java))
                     finish()
                 }
 
+                // 🔴 Error fatal (hardware no disponible, cancelación por sistema, etc.)
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                     super.onAuthenticationError(errorCode, errString)
 
-                    if (errorCode == BiometricPrompt.ERROR_USER_CANCELED ||
-                        errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
-                        Toast.makeText(applicationContext, "Autenticación cancelada ❌", Toast.LENGTH_SHORT).show()
-                        finish() // Bloquea acceso cerrando la app
-                    } else {
-                        Toast.makeText(applicationContext, "Error: $errString", Toast.LENGTH_SHORT).show()
+                    // Si el usuario presiona "Cancelar" no cerramos la app
+                    if (errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON ||
+                        errorCode == BiometricPrompt.ERROR_USER_CANCELED) {
+
+                        msg("Autenticación cancelada")
+                        return
                     }
+
+                    // Otros errores graves
+                    msg("Error: $errString")
                 }
 
+                // 🔄 Huella no coincide
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
-                    Toast.makeText(applicationContext, "Huella no reconocida ❌", Toast.LENGTH_SHORT).show()
+                    msg("Huella no reconocida ❌")
                 }
             })
 
+        // Prompt moderno con fallback a PIN/PATRÓN
         promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle("Autenticación requerida")
-            .setSubtitle("Usa tu huella para continuar")
-            .setNegativeButtonText("Cancelar")
+            .setSubtitle("Usa huella o PIN/PATRÓN para acceder")
+            .setAllowedAuthenticators(
+                BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                        BiometricManager.Authenticators.DEVICE_CREDENTIAL
+            )
             .build()
+    }
+
+    /**
+     * Lanza autenticación solo si el dispositivo lo soporta
+     */
+    private fun authenticateUser() {
+        val biometric = BiometricManager.from(this)
+
+        when (biometric.canAuthenticate(
+            BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                    BiometricManager.Authenticators.DEVICE_CREDENTIAL
+        )) {
+
+            BiometricManager.BIOMETRIC_SUCCESS ->
+                biometricPrompt.authenticate(promptInfo)
+
+            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE ->
+                msg("Este dispositivo no tiene sensor biométrico")
+
+            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE ->
+                msg("El sensor biométrico no está disponible")
+
+            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED ->
+                msg("No hay huellas ni PIN/PATRÓN configurado en el dispositivo")
+        }
+    }
+
+    /**
+     * Función helper para toasts
+     */
+    private fun msg(text: String) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
     }
 }
